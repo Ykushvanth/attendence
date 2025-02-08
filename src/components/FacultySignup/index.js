@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './index.css';
+import { supabase } from '../../supabaseConfig';
 
 const FacultySignup = () => {
     const navigate = useNavigate();
@@ -14,6 +15,8 @@ const FacultySignup = () => {
         password: '',
         confirmPassword: ''
     });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -24,32 +27,44 @@ const FacultySignup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setLoading(true);
+        setError('');
+
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords don't match!");
+            setError("Passwords don't match!");
+            setLoading(false);
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:8000/api/faculty/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const { data, error } = await supabase
+                .from('faculty')
+                .insert([
+                    {
+                        faculty_id: formData.facultyId,
+                        name: formData.name,
+                        email: formData.email,
+                        department: formData.department,
+                        subjects: formData.subjects,
+                        sections: formData.sections,
+                        password: formData.password
+                    }
+                ])
+                .select();
 
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Registration successful!');
-                navigate('/faculty-login');
-            } else {
-                alert(data.error || 'Registration failed');
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
             }
+
+            console.log('Faculty data inserted:', data);
+            alert('Registration successful!');
+            navigate('/faculty-login');
         } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred during registration');
+            console.error('Error during registration:', error);
+            setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 

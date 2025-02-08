@@ -15,11 +15,11 @@ const StudentProfile = () => {
 
     // Sample attendance data
     const attendanceData = [
-        { subject: 'Data Structures', total: 45, present: 42, percentage: 93.33 },
-        { subject: 'Database Management', total: 40, present: 38, percentage: 95 },
-        { subject: 'Web Development', total: 35, present: 32, percentage: 91.43 },
-        { subject: 'Computer Networks', total: 42, present: 39, percentage: 92.86 },
-        { subject: 'Operating Systems', total: 38, present: 35, percentage: 92.11 }
+        { subject: 'Design and Analysis of Algorithms', total: 45, present: 42, percentage: 93.33 },
+        { subject: 'Operating Systems', total: 40, present: 38, percentage: 95 },
+        { subject: 'Software Engineering', total: 35, present: 32, percentage: 91.43 },
+        { subject: 'Natural Language Processing Techniques', total: 42, present: 39, percentage: 92.86 },
+        { subject: 'Deep Learning', total: 38, present: 35, percentage: 92.11 }
     ];
 
     useEffect(() => {
@@ -339,7 +339,7 @@ const StudentProfile = () => {
                             </div>
                             <div className="schedule-content">
                                 <img 
-                                    src="https://res.cloudinary.com/dcehhrctc/image/upload/v1731609483/Schedule_tlxw2h.jpg" 
+                                    src="https://res.cloudinary.com/dcehhrctc/image/upload/v1731668561/Dinesh_time_tabel_d7hobs.jpg" 
                                     alt="Class Schedule" 
                                     className="schedule-image"
                                 />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './index.css';
+import { supabase } from '../../supabaseConfig';
 
 const StudentSignup = () => {
   const [formData, setFormData] = useState({
@@ -28,44 +29,35 @@ const StudentSignup = () => {
     e.preventDefault();
     setError('');
 
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords don't match!");
+      return;
+    }
+
     try {
-        console.log('Sending registration data:', {
-            ...formData,
-            password: '[HIDDEN]'
-        });
+      // Insert data directly into Supabase students table
+      const { data, error } = await supabase
+        .from('students')
+        .insert([
+          {
+            registration_number: formData.registration_number,
+            name: formData.name,
+            section: formData.section,
+            email: formData.email,
+            department: formData.department,
+            year: formData.year,
+            password: formData.password // Note: In production, you should hash passwords
+          }
+        ])
+        .select();
 
-        const response = await fetch('http://localhost:8000/api/students/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                registration_number: formData.registration_number,
-                name: formData.name,
-                section: formData.section,
-                email: formData.email,
-                department: formData.department,
-                year: formData.year,
-                password: formData.password
-            }),
-        });
+      if (error) throw error;
 
-        const data = await response.json();
-        console.log('Server response:', data);
-
-        if (response.ok) {
-            alert('Registration successful!');
-            navigate('/student-login');
-        } else {
-            const errorMessage = data.error || 'Registration failed';
-            console.error('Registration error:', errorMessage);
-            setError(errorMessage);
-            alert(errorMessage);
-        }
+      alert('Registration successful!');
+      navigate('/student-login');
     } catch (error) {
-        console.error('Network error:', error);
-        setError('An error occurred during registration');
-        alert('An error occurred during registration');
+      console.error('Error:', error);
+      setError(error.message);
     }
   };
 

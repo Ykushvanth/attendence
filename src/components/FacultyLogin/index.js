@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './index.css';
+import { supabase } from '../../supabaseConfig';
 
 const FacultyLogin = () => {
     const navigate = useNavigate();
@@ -25,24 +26,20 @@ const FacultyLogin = () => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/api/faculty/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const { data, error } = await supabase
+                .from('faculty')
+                .select('*')
+                .eq('faculty_id', formData.facultyId)
+                .eq('password', formData.password) // Note: In production, use proper password hashing
+                .single();
 
-            const data = await response.json();
+            if (error) throw error;
 
-            if (!response.ok) {
-                throw new Error(data.error || 'Login failed');
+            if (!data) {
+                throw new Error('Invalid credentials');
             }
 
-            // Store faculty data in localStorage
-            localStorage.setItem('facultyData', JSON.stringify(data.faculty));
-            
-            // Navigate to faculty profile
+            localStorage.setItem('facultyData', JSON.stringify(data));
             navigate('/faculty-profile');
         } catch (err) {
             setError(err.message);
